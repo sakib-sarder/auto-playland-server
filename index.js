@@ -1,4 +1,4 @@
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
@@ -28,16 +28,45 @@ const toyCollection = client.db("AutoPlayland").collection("toysCollection");
 
 async function run() {
   try {
-    await client.connect();
+    // await client.connect();
 
     app.post("/toys", async (req, res) => {
       const newToy = req.body;
+      console.log(newToy);
       const result = await toyCollection.insertOne(newToy);
       res.send(result);
     });
 
     app.get("/all-toys", async (req, res) => {
       const result = await toyCollection.find().toArray();
+      res.send(result);
+    });
+
+    app.get("/all-toys/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await toyCollection.findOne(query);
+      res.send(result);
+    });
+
+    app.get("/toys/:email", async (req, res) => {
+      const email = req.params.email;
+      const result = await toyCollection.find({ sellerEmail: email }).toArray();
+      res.send(result);
+    });
+
+    const indexKeys = { name: 1 };
+    const indexOption = { name: "title" };
+
+    const result = await toyCollection.createIndex(indexKeys, indexOption);
+
+    app.get("/toySearchByName/:text", async (req, res) => {
+      const searchText = req.params.text;
+      const result = await toyCollection
+        .find({
+          name: { $regex: searchText, $options: "i" },
+        })
+        .toArray();
       res.send(result);
     });
 
