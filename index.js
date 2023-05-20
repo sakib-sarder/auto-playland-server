@@ -38,7 +38,7 @@ async function run() {
     });
 
     app.get("/all-toys", async (req, res) => {
-      const result = await toyCollection.find().toArray();
+      const result = await toyCollection.find().limit(20).toArray();
       res.send(result);
     });
 
@@ -75,6 +75,23 @@ async function run() {
       const query = { _id: new ObjectId(id) };
       const result = await toyCollection.deleteOne(query);
       res.send(result);
+    });
+
+    app.put("/my-toy/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+      const toy = req.body;
+      const option = { upsert: true };
+      const updatedToy = {
+        $set: {
+          price: toy.price,
+          availableQuantity: toy.availableQuantity,
+          details: toy.details,
+        },
+      };
+      const result = await toyCollection.updateOne(filter, updatedToy, option);
+      res.send(result);
+      console.log(toy);
     });
 
     await client.db("admin").command({ ping: 1 });
