@@ -38,7 +38,15 @@ async function run() {
     });
 
     app.get("/all-toys", async (req, res) => {
-      const result = await toyCollection.find().limit(20).toArray();
+      const type = req.query.type === "acending";
+      const value = req.query.value;
+      const sortObj = {};
+      sortObj[value] = type ? 1 : -1;
+      const result = await toyCollection
+        .find({})
+        .sort(sortObj)
+        .limit(20)
+        .toArray();
       res.send(result);
     });
 
