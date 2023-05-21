@@ -45,6 +45,7 @@ async function run() {
       const result = await toyCollection
         .find({})
         .sort(sortObj)
+        .collation({locale: "en_US", numericOrdering: true})
         .limit(20)
         .toArray();
       res.send(result);
