@@ -25,6 +25,9 @@ const client = new MongoClient(uri, {
 });
 
 const toyCollection = client.db("AutoPlayland").collection("toysCollection");
+const reviewCollection = client
+  .db("AutoPlayland")
+  .collection("reviewCollection");
 
 async function run() {
   try {
@@ -44,7 +47,7 @@ async function run() {
       const result = await toyCollection
         .find({})
         .sort(sortObj)
-        .collation({locale: "en_US", numericOrdering: true})
+        .collation({ locale: "en_US", numericOrdering: true })
         .limit(20)
         .toArray();
       res.send(result);
@@ -100,6 +103,18 @@ async function run() {
       const result = await toyCollection.updateOne(filter, updatedToy, option);
       res.send(result);
       console.log(toy);
+    });
+
+    //Post Review to Collection
+    app.post("/review", async (req, res) => {
+      const review = req.body;
+      const result = await reviewCollection.insertOne(review);
+      res.send(result);
+    });
+    // Get Review
+    app.get("/reviews", async (req, res) => {
+      const result = await reviewCollection.find().toArray();
+      res.send(result);
     });
 
     await client.db("admin").command({ ping: 1 });
