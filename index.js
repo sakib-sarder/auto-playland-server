@@ -117,6 +117,19 @@ async function run() {
       res.send(result);
     });
 
+    // Get truck toys
+    app.get("/trucks", async (req, res) => {
+      const query = { subCategory: "Truck" }
+      const result = await toyCollection.find(query).toArray();
+      res.send(result);
+    })
+    // Get truck toys
+    app.get("/sports-car", async (req, res) => {
+      const query = { subCategory: "Sports Car" }
+      const result = await toyCollection.find(query).toArray();
+      res.send(result);
+    })
+
     await client.db("admin").command({ ping: 1 });
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!"
